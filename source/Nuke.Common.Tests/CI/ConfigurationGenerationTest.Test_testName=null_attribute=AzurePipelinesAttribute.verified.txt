@@ -69,10 +69,10 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: src
-              pathtoPublish: 'src'
+              artifactName: 'Ubuntu1804-Restore'
+              targetPath: 'src'
       - job: Compile
         displayName: 'Compile'
         dependsOn: [ Restore ]
@@ -100,10 +100,10 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: src
-              pathtoPublish: 'src'
+              artifactName: 'Ubuntu1804-Compile'
+              targetPath: 'src'
       - job: Test
         displayName: 'Test'
         dependsOn: [ Compile ]
@@ -133,10 +133,10 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: test-results
-              pathtoPublish: 'output/test-results'
+              artifactName: 'Ubuntu1804-Test'
+              targetPath: 'output/test-results'
       - job: Coverage
         displayName: 'Coverage'
         dependsOn: [ Test ]
@@ -158,24 +158,24 @@ stages:
               key: $(Agent.OS) | nuget-packages | **/global.json, **/*.csproj
               restoreKeys: $(Agent.OS) | nuget-packages
               path: $(HOME)/.nuget/packages
-          - task: DownloadBuildArtifacts@0
+          - task: DownloadPipelineArtifact@2
             inputs:
               buildType: 'current'
-              downloadType: 'specific'
+              artifactName: 'Ubuntu1804-Test'
               itemPattern: |
-                output/test-results/*.trx
-                output/test-results/*.xml
-              downloadPath: '$(Build.Repository.LocalPath)'
+                *.trx
+                *.xml
+              targetPath: '$(Build.Repository.LocalPath)/output/test-results'
           - task: CmdLine@2
             inputs:
               script: './build.cmd Coverage --skip'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: coverage-report.zip
-              pathtoPublish: 'output/coverage-report.zip'
+              artifactName: 'Ubuntu1804-Coverage'
+              targetPath: 'output/coverage-report.zip'
   - stage: windows_2019
     displayName: 'windows-2019'
     dependsOn: [  ]
@@ -209,10 +209,10 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: src
-              pathtoPublish: 'src'
+              artifactName: 'Windows2019-Restore'
+              targetPath: 'src'
       - job: Compile
         displayName: 'Compile'
         dependsOn: [ Restore ]
@@ -240,10 +240,10 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: src
-              pathtoPublish: 'src'
+              artifactName: 'Windows2019-Compile'
+              targetPath: 'src'
       - job: Test
         displayName: 'Test'
         dependsOn: [ Compile ]
@@ -273,10 +273,10 @@ stages:
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: test-results
-              pathtoPublish: 'output/test-results'
+              artifactName: 'Windows2019-Test'
+              targetPath: 'output/test-results'
       - job: Coverage
         displayName: 'Coverage'
         dependsOn: [ Test ]
@@ -298,21 +298,21 @@ stages:
               key: $(Agent.OS) | nuget-packages | **/global.json, **/*.csproj
               restoreKeys: $(Agent.OS) | nuget-packages
               path: $(USERPROFILE)/.nuget/packages
-          - task: DownloadBuildArtifacts@0
+          - task: DownloadPipelineArtifact@2
             inputs:
               buildType: 'current'
-              downloadType: 'specific'
+              artifactName: 'Windows2019-Test'
               itemPattern: |
-                output/test-results/*.trx
-                output/test-results/*.xml
-              downloadPath: '$(Build.Repository.LocalPath)'
+                *.trx
+                *.xml
+              targetPath: '$(Build.Repository.LocalPath)/output/test-results'
           - task: CmdLine@2
             inputs:
               script: './build.cmd Coverage --skip'
             env:
               SYSTEM_ACCESSTOKEN: $(System.AccessToken)
               ApiKey: $(ApiKey)
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: coverage-report.zip
-              pathtoPublish: 'output/coverage-report.zip'
+              artifactName: 'Windows2019-Coverage'
+              targetPath: 'output/coverage-report.zip'

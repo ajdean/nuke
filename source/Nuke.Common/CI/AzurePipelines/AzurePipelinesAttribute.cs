@@ -3,7 +3,6 @@
 // https://github.com/nuke-build/nuke/blob/master/LICENSE
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -265,13 +264,19 @@ namespace Nuke.Common.CI.AzurePipelines
 
             var chainLinkTargets = GetInvokedTargets(executableTarget, relevantTargets).ToArray();
 
-            var artifactDependencies = chainLinkTargets.SelectMany(x =>
-                from dependency in x.ArtifactDependencies
-                let rules = dependency.Select(GetArtifact).ToArray()
-                select new AzurePipelinesDownloadStep
-                       {
-                           ItemPatterns = rules
-                       }).ToArray();
+            var artifactDependencies = 
+                (from dependency in executableTarget.ArtifactDependencies
+                 from path in dependency
+                 let absolutePath = (AbsolutePath)path
+                 let targetPath = absolutePath.DescendantsAndSelf(y => y.Parent).FirstOrDefault(y => !y.ToString().ContainsOrdinalIgnoreCase("*"))
+                 let itemPattern = absolutePath.ToString()[targetPath.ToString().Length..].TrimStart('\\', '/')
+                 group itemPattern by new { Target = dependency.Key.Name, TargetPath = GetArtifactPath(targetPath) } into grouped
+                 select new AzurePipelinesDownloadStep
+                {
+                    ArtifactName = $"{image}-{grouped.Key.Target}",
+                    TargetPath = grouped.Key.TargetPath,
+                    ItemPatterns = grouped.ToArray()
+                }).ToArray();                
 
             foreach (var artifactDependency in artifactDependencies)
             {
@@ -290,8 +295,8 @@ namespace Nuke.Common.CI.AzurePipelines
             {
                 yield return new AzurePipelinesPublishStep
                              {
-                                 ArtifactName = publishedArtifact.Split('/').Last(),
-                                 PathToPublish = publishedArtifact
+                                 ArtifactName = $"{image}-{executableTarget.Name}",
+                                 TargetPath = publishedArtifact
                              };
             }
         }

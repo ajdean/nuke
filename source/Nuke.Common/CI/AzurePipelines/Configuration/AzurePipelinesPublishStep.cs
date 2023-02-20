@@ -13,16 +13,16 @@ namespace Nuke.Common.CI.AzurePipelines.Configuration
     public class AzurePipelinesPublishStep : AzurePipelinesStep
     {
         public string ArtifactName { get; set; }
-        public string PathToPublish { get; set; }
+        public string TargetPath { get; set; }
 
         public override void Write(CustomFileWriter writer)
         {
-            using (writer.WriteBlock("- task: PublishBuildArtifacts@1"))
+            using (writer.WriteBlock("- task: PublishPipelineArtifact@1"))
             {
                 using (writer.WriteBlock("inputs:"))
                 {
-                    writer.WriteLine($"artifactName: {ArtifactName}");
-                    writer.WriteLine($"pathtoPublish: {PathToPublish.SingleQuote()}");
+                    writer.WriteLine($"artifactName: {ArtifactName.SingleQuote()}");
+                    writer.WriteLine($"targetPath: {TargetPath.SingleQuote()}");
                 }
             }
         }

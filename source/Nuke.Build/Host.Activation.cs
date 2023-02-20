@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
+using Microsoft.Extensions.DependencyModel;
 using Nuke.Common.Execution;
 using Nuke.Common.Utilities;
 
@@ -25,10 +26,24 @@ namespace Nuke.Common
                 .First();
 
         internal static IEnumerable<Type> AvailableTypes
-            => AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(x => x.GetTypes())
-                .Where(x => x.IsPublic)
-                .Where(x => x.IsSubclassOf(typeof(Host)));
+        {
+            get
+            {
+                var assemblyNames = DependencyContext.Default.GetRuntimeAssemblyNames(string.Empty)
+                    .Where(a => a.FullName.StartsWith("Nuke."))
+                    .ToList();
+
+                foreach (var assemblyName in assemblyNames)
+                {
+                    AppDomain.CurrentDomain.Load(assemblyName);
+                }
+            
+                return AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(x => x.GetTypes())
+                    .Where(x => x.IsPublic)
+                    .Where(x => x.IsSubclassOf(typeof(Host)));
+            }
+        }
 
         private static bool IsRunning(Type hostType)
         {

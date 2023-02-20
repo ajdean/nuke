@@ -47,10 +47,10 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd Restore Compile Test --skip --partition $(System.JobPositionInPhase)/2'
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: test-results
-              pathtoPublish: 'output/test-results'
+              artifactName: 'UbuntuLatest-Test'
+              targetPath: 'output/test-results'
       - job: Pack
         displayName: '📦 Pack'
         dependsOn: [  ]
@@ -72,10 +72,10 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd Restore Compile DownloadLicenses Pack --skip'
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: packages
-              pathtoPublish: 'output/packages'
+              artifactName: 'UbuntuLatest-Pack'
+              targetPath: 'output/packages'
   - stage: windows_latest
     displayName: 'windows-latest'
     dependsOn: [  ]
@@ -105,10 +105,10 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd Restore Compile Test --skip --partition $(System.JobPositionInPhase)/2'
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: test-results
-              pathtoPublish: 'output/test-results'
+              artifactName: 'WindowsLatest-Test'
+              targetPath: 'output/test-results'
       - job: Pack
         displayName: '📦 Pack'
         dependsOn: [  ]
@@ -130,10 +130,10 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd Restore Compile DownloadLicenses Pack --skip'
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: packages
-              pathtoPublish: 'output/packages'
+              artifactName: 'WindowsLatest-Pack'
+              targetPath: 'output/packages'
   - stage: macOS_latest
     displayName: 'macOS-latest'
     dependsOn: [  ]
@@ -163,10 +163,10 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd Restore Compile Test --skip --partition $(System.JobPositionInPhase)/2'
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: test-results
-              pathtoPublish: 'output/test-results'
+              artifactName: 'MacOsLatest-Test'
+              targetPath: 'output/test-results'
       - job: Pack
         displayName: '📦 Pack'
         dependsOn: [  ]
@@ -188,7 +188,7 @@ stages:
           - task: CmdLine@2
             inputs:
               script: './build.cmd Restore Compile DownloadLicenses Pack --skip'
-          - task: PublishBuildArtifacts@1
+          - task: PublishPipelineArtifact@1
             inputs:
-              artifactName: packages
-              pathtoPublish: 'output/packages'
+              artifactName: 'MacOsLatest-Pack'
+              targetPath: 'output/packages'
